@@ -15,11 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.spring.tdd.model.ResponseVO;
 import com.spring.tdd.model.Todo;
 import com.spring.tdd.repository.TodoRepository;
-
-import ch.qos.logback.core.joran.action.Action;
 
 @ExtendWith(MockitoExtension.class)
 class TodoSerivceTest {
