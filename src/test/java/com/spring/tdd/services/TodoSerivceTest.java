@@ -88,7 +88,9 @@ class TodoSerivceTest {
 		assertThat(actualResponseVO.isSuccess()).isEqualTo(false);
 		assertThat(actualResponseVO.getMessage()).isEqualTo("Todo Not Found");
 	};
+	
 	@Test
+	@DisplayName("Finding Todo by title")
 	void testFindTodoByTitle() {
 		when(todoRepository.findByTitle(Mockito.anyString())).thenReturn(todo);
 		
@@ -100,9 +102,28 @@ class TodoSerivceTest {
 	}
 
 	@Test
-	@Disabled
+	@DisplayName("Saving Todo")
 	void testSaveTodo() {
-		fail("Not yet implemented");
+		Todo savedTodo = new Todo();
+		savedTodo.setTitle("Test Todo");
+		savedTodo.setDescription("Test Todo Description");
+		
+		when(todoRepository.save(Mockito.any(Todo.class))).thenReturn(savedTodo);
+		
+		ResponseVO responseVO = todoService.saveTodo(savedTodo);
+		assertThat(responseVO).isNotNull();
+		
+		Todo actualTodo = (Todo) responseVO.getResponse();
+		assertThat(savedTodo.getTitle()).isEqualTo(actualTodo.getTitle());
+		assertThat(savedTodo.getDescription()).isEqualTo(actualTodo.getDescription());
+	}
+	
+	@Test
+	@DisplayName("Throw Exception when todo is null")
+	public void testSaveTodo_throwExceptionWhenTodoIsNull() {
+		Todo todo =null;
+		assertThatExceptionOfType(IllegalArgumentException.class)
+		.isThrownBy(()->todoService.saveTodo(todo)).withMessageContaining("Todo cannot be null");
 	}
 
 	@Test

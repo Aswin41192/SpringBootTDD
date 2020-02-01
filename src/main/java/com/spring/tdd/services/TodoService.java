@@ -68,7 +68,14 @@ public class TodoService {
 	}
 	
 	public ResponseVO saveTodo(@RequestBody Todo todo) {
-		return null;
+		if(todo == null) throw new IllegalArgumentException("Todo cannot be null");
+		try {
+			Todo savedTodo = todoRepository.save(todo);
+			handleSuccessfulResponse(responseVO, savedTodo, "Todo Saved");
+		}catch(Exception e) {
+			handleFailureResponse(responseVO, "Exception while saving Todo");
+		}
+		return responseVO;
 	}
 	
 	public ResponseVO updateTodo(@RequestBody Todo todo) {
