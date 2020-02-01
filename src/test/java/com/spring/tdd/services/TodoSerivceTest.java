@@ -86,7 +86,7 @@ class TodoSerivceTest {
 		ResponseVO actualResponseVO=todoService.findTodoById(-1L);
 		assertThat(actualResponseVO).isNotNull();
 		assertThat(actualResponseVO.isSuccess()).isEqualTo(false);
-		assertThat(actualResponseVO.getMessage()).isEqualTo("Todo Not Found");
+		assertThat(actualResponseVO.getMessage()).isEqualTo("Todo Not Found!");
 	};
 	@Test
 	void testFindTodoByTitle() {
