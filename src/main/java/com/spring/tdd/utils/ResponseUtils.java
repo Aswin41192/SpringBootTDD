@@ -17,4 +17,8 @@ public class ResponseUtils {
 		responseVO.setResponse(null);
 		return responseVO;
 	}
+	
+	public static void throwIllegalArgumentException(String message) {
+		throw new IllegalArgumentException(message);
+	}
 }

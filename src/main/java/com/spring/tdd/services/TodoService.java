@@ -1,6 +1,7 @@
 package com.spring.tdd.services;
 
 import static com.spring.tdd.utils.ResponseUtils.handleFailureResponse;
+import static com.spring.tdd.utils.ResponseUtils.throwIllegalArgumentException;
 import static com.spring.tdd.utils.ResponseUtils.handleSuccessfulResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class TodoService {
 	}
 	
 	public ResponseVO findTodoById(Long id) {
-		if(id==null) throw new IllegalArgumentException("Todo Id cannot be null");
+		if(id==null) throwIllegalArgumentException("Todo Id cannot be null");
 		try {
 			Optional<Todo> todo = todoRepository.findById(id);
 			if(todo.isPresent()) {
@@ -68,7 +69,7 @@ public class TodoService {
 	}
 	
 	public ResponseVO saveTodo(@RequestBody Todo todo) {
-		if(todo == null) throw new IllegalArgumentException("Todo cannot be null");
+		if(todo == null) throwIllegalArgumentException("Todo cannot be null");
 		try {
 			Todo savedTodo = todoRepository.save(todo);
 			handleSuccessfulResponse(responseVO, savedTodo, "Todo Saved");
@@ -79,10 +80,32 @@ public class TodoService {
 	}
 	
 	public ResponseVO updateTodo(@RequestBody Todo todo) {
-		return null;
+		if(todo == null) throw new IllegalArgumentException("Todo cannot be null");
+		try {
+			if(todoRepository.existsById(todo.getId())) {
+				Todo todoFromDB = todoRepository.findById(todo.getId()).get();
+				todoFromDB.setTitle(todo.getTitle());
+				todoFromDB.setDescription(todo.getDescription());
+				todoRepository.save(todoFromDB);
+				responseVO=handleSuccessfulResponse(responseVO, todoFromDB, "Successfully Updated");
+			}else {
+				responseVO = handleFailureResponse(responseVO, "Unable to update todo");
+			}
+		}catch(Exception e) {
+			
+		}
+		return responseVO;
 	}
 	
 	public ResponseVO deleteTodo(@RequestBody Todo todo) {
-		return null;
+		if(todo == null) throw new IllegalArgumentException("Todo cannot be null");
+		if(todoRepository.existsById(todo.getId())) {
+			todoRepository.deleteById(todo.getId());
+			responseVO = handleSuccessfulResponse(responseVO, null, "Successfully Deleted");
+		} else {
+			responseVO = handleFailureResponse(responseVO, "Unable to delete todo which doesnot exist");
+		}
+		
+		return responseVO;
 	}
 }

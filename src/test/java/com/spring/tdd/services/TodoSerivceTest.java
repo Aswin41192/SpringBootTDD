@@ -2,13 +2,14 @@ package com.spring.tdd.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -127,15 +128,78 @@ class TodoSerivceTest {
 	}
 
 	@Test
-	@Disabled
+	@DisplayName("Updating todo")
 	void testUpdateTodo() {
-		fail("Not yet implemented");
+		todo.setId(1L);
+		todo.setTitle("Updated title");
+		todo.setDescription("Updated Description");
+		
+		when(todoRepository.existsById(1L)).thenReturn(true);
+		when(todoRepository.findById(1L)).thenReturn(Optional.of(todo));
+		when(todoRepository.save(todo)).thenReturn(todo);
+		
+		ResponseVO responseVO = todoService.updateTodo(todo);
+		Todo actualTodo =(Todo) responseVO.getResponse();
+		
+		assertThat(actualTodo).isNotNull();
+		assertThat(responseVO).isNotNull();
+		assertThat(responseVO.isSuccess()).isTrue();
+		assertThat(actualTodo.getDescription()).isEqualTo(todo.getDescription());
+		assertThat(actualTodo.getTitle()).isEqualTo(todo.getTitle());
+	}
+	
+	@Test
+	@DisplayName("Throw Exception while todo to update is not in Database")
+	void testUpdateTodo_showFailure_whenIdNotExists() {
+		Todo todoToUpdate = new Todo();
+		todoToUpdate.setId(-1L);
+		
+		when(todoRepository.existsById(-1L)).thenReturn(false);
+		
+		ResponseVO responseVO = todoService.updateTodo(todoToUpdate);
+		assertThat(responseVO.isSuccess()).isFalse();
+		assertThat(responseVO.getMessage()).contains("Unable to update todo");
+	}
+	
+	@Test
+	@DisplayName("Throw Exception when todo to update is null")
+	void testUpdateTodo_throwException_OnNull(){
+		assertThatExceptionOfType(IllegalArgumentException.class)
+		.isThrownBy(()->todoService.updateTodo(null)).withMessageContaining("Todo cannot be null");
 	}
 
 	@Test	
-	@Disabled
-	void testDeleteTodo() {
-		fail("Not yet implemented");
+	@DisplayName("Throw Exception when todo to delete is null")
+	void testDeleteTodo_throwException_WhenTodoIsNull() {
+		assertThatExceptionOfType(IllegalArgumentException.class)
+		.isThrownBy(()->todoService.deleteTodo(null)).withMessageContaining("Todo cannot be null");
 	}
+	
+	@Test
+	@DisplayName("Show Failure Message when todo to delete doesnot exist")
+	void testDeleteTodo_whenTodoNotExists() {
+		when(todoRepository.existsById(todo.getId())).thenReturn(false);
+		
+		ResponseVO responseVO = todoService.deleteTodo(todo);
+		assertThat(responseVO).isNotNull();
+		assertThat(responseVO.isSuccess()).isFalse();
+		assertThat(responseVO.getMessage()).isEqualTo("Unable to delete todo which doesnot exist");
+	}
+	
+	@Test
+	@DisplayName("Delete Todo")
+	void testDeleteTodo() {
+		
+		when(todoRepository.existsById(todo.getId())).thenReturn(true);
+		doNothing().when(todoRepository).deleteById(todo.getId());
+		
+		ResponseVO actual = todoService.deleteTodo(todo);
+		
+		assertThat(actual).isNotNull();
+		assertThat(actual.isSuccess()).isTrue();
+		assertThat(actual.getMessage()).isEqualTo("Successfully Deleted");
+		
+	}
+	
 
 }
