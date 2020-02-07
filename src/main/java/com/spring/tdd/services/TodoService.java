@@ -6,31 +6,34 @@ import static com.spring.tdd.utils.ResponseUtils.handleSuccessfulResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.websocket.server.PathParam;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.spring.tdd.model.ResponseVO;
 import com.spring.tdd.model.Todo;
 import com.spring.tdd.repository.TodoRepository;
 
 @RestController
+@RequestMapping("/api/todo")
 public class TodoService {
 
 	private TodoRepository todoRepository;
 	private ResponseVO responseVO;
 	
-	public TodoService() {
-	}
-	
-
 	public TodoService(TodoRepository todoRepository, ResponseVO responseVO) {
 		super();
 		this.todoRepository = todoRepository;
 		this.responseVO = responseVO;
 	}
 
-
-
-
+	@GetMapping
 	public ResponseVO findAllTodos() {
 		List<Todo> todos=new ArrayList<Todo>();
 		try {
@@ -42,7 +45,8 @@ public class TodoService {
 		return responseVO;
 	}
 	
-	public ResponseVO findTodoById(Long id) {
+	@GetMapping("/{id}")
+	public ResponseVO findTodoById(@PathParam("id") Long id) {
 		if(id==null) throwIllegalArgumentException("Todo Id cannot be null");
 		try {
 			Optional<Todo> todo = todoRepository.findById(id);
@@ -58,7 +62,8 @@ public class TodoService {
 			}
 	
 	
-	public ResponseVO findTodoByTitle(String title) {
+	@GetMapping("/filter")
+	public ResponseVO findTodoByTitle(@RequestParam("title")String title) {
 		try {
 			Todo todo = todoRepository.findByTitle(title);
 			responseVO = handleSuccessfulResponse(responseVO, todo, "Filtered by Title");
@@ -68,6 +73,7 @@ public class TodoService {
 		return responseVO;
 	}
 	
+	@PostMapping
 	public ResponseVO saveTodo(@RequestBody Todo todo) {
 		if(todo == null) throwIllegalArgumentException("Todo cannot be null");
 		try {
@@ -79,6 +85,7 @@ public class TodoService {
 		return responseVO;
 	}
 	
+	@PutMapping
 	public ResponseVO updateTodo(@RequestBody Todo todo) {
 		if(todo == null) throw new IllegalArgumentException("Todo cannot be null");
 		try {
@@ -97,6 +104,7 @@ public class TodoService {
 		return responseVO;
 	}
 	
+	@DeleteMapping
 	public ResponseVO deleteTodo(@RequestBody Todo todo) {
 		if(todo == null) throw new IllegalArgumentException("Todo cannot be null");
 		if(todoRepository.existsById(todo.getId())) {
