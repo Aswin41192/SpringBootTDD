@@ -76,6 +76,10 @@ public class TodoService {
 	@PostMapping
 	public ResponseVO saveTodo(@RequestBody Todo todo) {
 		if(todo == null) throwIllegalArgumentException("Todo cannot be null");
+		if(null == todo.getTitle() || null == todo.getDescription()) {
+			responseVO = handleFailureResponse(responseVO, "Title & Description is mandatory");
+			return responseVO;
+		}
 		try {
 			Todo savedTodo = todoRepository.save(todo);
 			handleSuccessfulResponse(responseVO, savedTodo, "Todo Saved");

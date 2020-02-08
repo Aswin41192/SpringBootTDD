@@ -1,18 +1,14 @@
 package com.spring.tdd.model;
 
-import java.util.Collection;
-
 import javax.persistence.Entity;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 @Entity
-public class User extends BaseEntity implements UserDetails {
+public class User extends BaseEntity {
 	
 	private String username;
 	private String password;
 	private String roles;
+	private String authorities;
 	private boolean locked;
 	private boolean expired;
 	private boolean active;
@@ -58,45 +54,20 @@ public class User extends BaseEntity implements UserDetails {
 		this.password = password;
 	}
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
-	}
-
-	@Override
-	public String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
+		return username;
 	}
 
-	@Override
-	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+	public String getPassword() {
+		return password;
 	}
 
-	@Override
-	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
+	public String getAuthorities() {
+		return authorities;
 	}
 
-	@Override
-	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+	public void setAuthorities(String authorities) {
+		this.authorities = authorities;
 	}
-
-	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	
 }
